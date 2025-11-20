@@ -1,0 +1,238 @@
+body {
+    background-color: #eeede1;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+    line-height: 1.5;
+}
+
+.main-container {
+    width: 900px;
+    background-color: #ffffff; 
+    display: flex;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    overflow: hidden; 
+}
+
+.left-panel {
+    flex: 0 0 30%;
+    background-color: #5f9ea0;
+    color: white;
+    padding-bottom: 20px;
+    padding-top: 20px;
+}
+
+.right-panel {
+    flex: 1;
+    padding: 30px;
+}
+
+.left-panel .photo-panel img {
+    width: 100%;
+    display: block;
+    margin-bottom: 15px;
+}
+
+.left-panel h1 {
+    font-size: 2em;
+    padding: 0 25px;
+    margin-top: 0;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.left-panel p {
+    padding: 0 25px;
+    margin-top: 0;
+    opacity: 0.9;
+}
+
+.left-panel .text-content {
+    padding: 0 25px;
+}
+
+.left-panel h3 {
+    font-size: 1.1em;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.6); 
+    padding-bottom: 5px;
+    margin-top: 25px;
+    margin-bottom: 10px;
+}
+
+.left-panel .text-content p {
+    padding: 0;
+    font-size: 0.9em;
+}
+
+.left-panel ul {
+    list-style: none;
+    padding: 0;
+    font-size: 0.9em;
+}
+
+.left-panel ul li {
+    margin-bottom: 5px;
+}
+
+.left-panel a {
+    color: white;
+    text-decoration: none;
+    transition: opacity 0.2s;
+}
+
+.left-panel a:hover {
+    opacity: 0.8;
+}
+
+.left-panel .nccu-logo {
+    display: block;
+    width: 50px; 
+    height: auto;
+    margin: 30px auto 0;
+}
+
+.section {
+    margin-bottom: 30px;
+}
+
+.section-title {
+    font-size: 1.5em;
+    border-bottom: 2px solid #ccc;
+    padding-bottom: 5px;
+    margin-bottom: 15px;
+}
+
+.timeline-item {
+    display: flex;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+}
+
+.timeline-item .year {
+    flex: 0 0 120px; 
+    font-weight: bold;
+    color: #444;
+}
+
+.timeline-item .description {
+    flex: 1; 
+    color: #666;
+}
+
+.tag {
+    display: inline-block; 
+    padding: 6px 14px;
+    border-radius: 20px; 
+    background-color: #e6f7ff; 
+    color: #0077b6;
+    margin-right: 10px;
+    margin-bottom: 10px;
+    font-size: 0.9em;
+}
+
+.hw-lab-container {
+    display: flex; 
+    gap: 20px; 
+}
+
+.hw-column, .lab-column {
+    flex: 1; 
+    background-color: #f9f9f9;
+    padding: 15px;
+    border-radius: 6px;
+}
+
+.hw-column h3, .lab-column h3 {
+    font-size: 1.1em;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 5px;
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+.hw-column ul, .lab-column ul {
+    list-style-type: disc;
+    padding-left: 20px;
+    margin: 0;
+}
+
+.hw-column ul li, .lab-column ul li {
+    margin-bottom: 5px;
+}
+
+.hw-column a, .lab-column a {
+    text-decoration: none; 
+    color: #333;
+}
+
+.hw-column a:hover, .lab-column a:hover {
+    color: #5f9ea0; 
+}
+
+.music-row {
+    display: flex;
+    justify-content: space-around; 
+    align-items: flex-start;
+    padding: 10px 0;
+}
+
+.music-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    text-decoration: none;
+    color: #333;
+}
+
+.music-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    margin-bottom: 5px;
+}
+
+.music-item:hover .music-icon {
+    opacity: 0.8;
+}
+
+.song-title {
+    font-size: 0.85em;
+}
+
+.music-note {
+    font-size: 0.9em;
+    font-style: italic;
+    color: #666;
+    text-align: center;
+    margin-top: 20px;
+}
+
+.section {
+    margin-bottom: 30px; 
+    
+    background-color: #fcfcfc;
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0; 
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03);
+}
+
+.section-title {
+    font-size: 1.5em;
+    border-bottom: 2px solid #ccc;
+    padding-bottom: 5px;
+    margin-top: 0; 
+    margin-bottom: 15px;
+}
+
+.hw-column, .lab-column {
+    flex: 1;
+    background-color: #ffffff;
+    padding: 15px;
+    border-radius: 6px;
+    border: 1px solid #f0f0f0; 
+}
