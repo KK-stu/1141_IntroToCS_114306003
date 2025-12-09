@@ -1,0 +1,504 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>SilverCare AI - Demo</title>
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root{
+      --accent:#2b7a78;
+      --panel-bg: rgba(255,255,255,0.85);
+      --glass: rgba(255,255,255,0.7);
+      --card-radius:14px;
+    }
+    html,body{
+      height:100%;
+      margin:0;
+      font-family: "Noto Sans TC", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      color:#1b1b1b;
+    }
+    body{
+      background: url('background.png') center/cover no-repeat fixed;
+      display:flex;
+      align-items:stretch;
+      justify-content:center;
+    }
+
+    /* site container full viewport */
+    .app{
+      width:100%;
+      min-height:100vh;
+      display:flex;
+      flex-direction:column;
+    }
+
+    /* header */
+    header{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      padding:12px 18px;
+      backdrop-filter: blur(4px);
+    }
+    .home-link{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      cursor:pointer;
+      text-decoration:none;
+      color:inherit;
+    }
+    .home-link img{ width:36px; height:36px; object-fit:contain; }
+
+    .brand{
+      font-weight:700;
+      font-size:20px;
+      padding:6px 12px;
+      background: linear-gradient(90deg, rgba(255,255,255,0.6), rgba(255,255,255,0.3));
+      border-radius:10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+    }
+
+    /* main content area */
+    .main{
+      flex:1;
+      display:flex;
+      padding:20px;
+      gap:20px;
+      box-sizing:border-box;
+    }
+
+    /* left nav (small) */
+    nav.sidebar{
+      width:90px;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      align-items:center;
+      padding:10px;
+    }
+    nav.sidebar button{
+      width:64px;height:64px;border-radius:12px;border:none;background:var(--glass);
+      display:flex;align-items:center;justify-content:center;cursor:pointer;
+      box-shadow:0 2px 6px rgba(0,0,0,0.12);
+    }
+    nav.sidebar button:hover{ transform:translateY(-4px); }
+
+    /* page panel */
+    .page{
+      flex:1;
+      background: linear-gradient(180deg, rgba(255,255,255,0.6), rgba(255,255,255,0.5));
+      border-radius:var(--card-radius);
+      padding:18px;
+      box-sizing:border-box;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+      overflow:auto;
+    }
+
+    .hidden{ display:none; }
+
+    /* Page2 - center layout */
+    .chat-center{
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:12px;
+      margin-top:30px;
+    }
+    .chat-center img{ width:320px; max-width:70%; border-radius:12px; box-shadow:0 6px 18px rgba(0,0,0,0.12); }
+
+    .controls{ display:flex; gap:12px; align-items:center; margin-top:6px;}
+    .btn{
+      padding:10px 16px; border-radius:10px; border:none; cursor:pointer; font-weight:600;
+      box-shadow:0 3px 8px rgba(0,0,0,0.1);
+    }
+    .btn-primary{ background:var(--accent); color:white; }
+    .btn-ghost{ background:transparent; border:1px solid rgba(0,0,0,0.08); }
+
+    .status-text{ margin-top:8px; font-size:16px; color:#333; min-height:22px; }
+
+    .daily-quotes{ margin-top:18px; font-size:15px; font-style:italic; color:#1b4f4f; text-align:center; max-width:740px; }
+
+    /* Page3 social carousel */
+    .social-wrap{ display:flex; align-items:center; justify-content:center; gap:12px; margin-top:24px; }
+    .arrow{ font-size:28px; cursor:pointer; user-select:none; padding:8px; background:var(--glass); border-radius:8px;}
+    .social-card{ width:70%; min-height:220px; background:rgba(255,255,255,0.96); border-radius:12px; padding:16px; box-sizing:border-box; display:flex; flex-direction:column; align-items:center; justify-content:space-between;}
+    .social-card .content{ text-align:center; font-size:16px; }
+    .social-card img.icon{ width:64px; height:64px; object-fit:contain; margin-top:8px; cursor:pointer; }
+
+    /* Page4 simple feed */
+    .feed{ display:flex; flex-direction:column; gap:12px; margin-top:12px; }
+    .post{
+      background: white; padding:12px; border-radius:10px; box-shadow:0 2px 8px rgba(0,0,0,0.06);
+    }
+    .post .meta{ font-size:12px; color:#666; margin-bottom:6px; }
+    .new-post{ display:flex; gap:8px; align-items:flex-start; margin-bottom:12px; }
+    .new-post textarea{ flex:1; min-height:64px; padding:10px; border-radius:10px; border:1px solid #ddd; resize:vertical; }
+
+    /* Page5 table & chart */
+    .chart-wrap{ width:100%; max-width:920px; margin:8px auto; }
+    table.report{
+      width:100%; border-collapse:collapse; margin-top:12px; background:white; border-radius:8px; overflow:hidden;
+    }
+    table.report th, table.report td{ padding:10px 12px; border-bottom:1px solid #eee; text-align:left; }
+    table.report thead th{ background: #f7f7f7; font-weight:600; }
+
+    /* poster block on homepage */
+    .poster{
+      padding:16px; background: rgba(255,255,255,0.9); border-radius:12px; max-width:880px; margin: 18px auto;
+      box-shadow:0 6px 20px rgba(0,0,0,0.08);
+    }
+
+    /* responsive */
+    @media (max-width:900px){
+      nav.sidebar{ display:none; }
+      .social-card{ width:92%; }
+      .home-link img{ width:30px;height:30px;}
+    }
+
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <a class="home-link" id="homeIcon" title="回首頁">
+        <!-- 可換成房子 svg 或圖片 -->
+        <img src="https://cdn-icons-png.flaticon.com/512/1946/1946433.png" alt="home icon" />
+      </a>
+      <div class="brand">SilverCare AI</div>
+    </header>
+
+    <div class="main">
+      <nav class="sidebar" aria-label="navigation">
+        <button onclick="showPage('home')" title="首頁">首頁</button>
+        <button onclick="showPage('chat')" title="語音對談">對談</button>
+        <button onclick="showPage('social')" title="家人動態">家人</button>
+        <button onclick="showPage('feed')" title="社群">社群</button>
+        <button onclick="showPage('report')" title="健康報告">報告</button>
+      </nav>
+
+      <section class="page" id="page-home">
+        <h2>歡迎使用 SilverCare AI</h2>
+        <div class="poster" role="region" aria-label="效益與未來展望">
+          <h3>效益與未來展望</h3>
+          <p id="poster-text">
+            提升長者心理支持與社會參與，降低孤獨與詐騙風險；建立閩南語語音資料庫，促進長照與語言科技應用，未來可延伸為多語言照護平台。
+          </p>
+        </div>
+        <p>使用說明：左側按鈕或左上房子圖示可快速切換頁面。</p>
+      </section>
+
+      <section class="page hidden" id="page-chat">
+        <h2>語音對談</h2>
+        <div class="chat-center">
+          <div id="aboveText">很高興和你聊天～</div>
+          <img src="silver care.png" alt="Silver Care" />
+          <div class="controls">
+            <button class="btn btn-primary" id="btnStart">開始收聽</button>
+            <button class="btn btn-ghost" id="btnStop">停止</button>
+            <button class="btn" id="btnPlayTTS">播放回覆（示範）</button>
+          </div>
+          <div class="status-text" id="listenStatus">很開心和你聊天...</div>
+
+          <div class="daily-quotes" id="dailyQuote">「不要害怕改變，改變是成功的第一步。」</div>
+        </div>
+      </section>
+
+      <section class="page hidden" id="page-social">
+        <h2>家人社群更新</h2>
+        <div class="social-wrap">
+          <div class="arrow" id="prevBtn" aria-label="上一則">&lt;</div>
+          <div class="social-card" id="socialCard">
+            <div class="content" id="socialContent">
+              <!-- content injected by JS -->
+            </div>
+            <div>
+              <img class="icon" id="socialIcon" src="" alt="app icon" />
+            </div>
+          </div>
+          <div class="arrow" id="nextBtn" aria-label="下一則">&gt;</div>
+        </div>
+      </section>
+
+      <section class="page hidden" id="page-feed">
+        <h2>內建社群平台</h2>
+        <div class="new-post">
+          <div style="width:64px;"><strong>使用者</strong></div>
+          <textarea id="postText" placeholder="寫些事情與家人分享..."></textarea>
+          <div>
+            <button class="btn btn-primary" id="postBtn">發文</button>
+          </div>
+        </div>
+
+        <div class="feed" id="feedList">
+          <!-- sample posts -->
+        </div>
+      </section>
+
+      <section class="page hidden" id="page-report">
+        <h2>健康報告與使用紀錄</h2>
+        <div class="chart-wrap">
+          <canvas id="moodChart"></canvas>
+        </div>
+
+        <table class="report" id="reportTable" aria-label="情緒紀錄表">
+          <thead>
+            <tr><th>日期時間</th><th>情緒指數</th><th>當日特別事項</th></tr>
+          </thead>
+          <tbody>
+            <!-- rows injected by JS -->
+          </tbody>
+        </table>
+      </section>
+
+    </div>
+  </div>
+
+  <script>
+    // Simple page switcher
+    const pages = ['home','chat','social','feed','report'];
+    function showPage(name){
+      pages.forEach(p=>{
+        const el = document.getElementById('page-' + p);
+        if(!el) return;
+        if(p === name) el.classList.remove('hidden'); else el.classList.add('hidden');
+      });
+    }
+    // initial
+    showPage('home');
+
+    // home icon clicks -> open social pages as example
+    document.getElementById('homeIcon').addEventListener('click', ()=> showPage('home'));
+
+    /* ----------------------
+       Page2: Speech demo (Web Speech API)
+       ---------------------- */
+    const btnStart = document.getElementById('btnStart');
+    const btnStop = document.getElementById('btnStop');
+    const listenStatus = document.getElementById('listenStatus');
+    const aboveText = document.getElementById('aboveText');
+    const dailyQuote = document.getElementById('dailyQuote');
+
+    // quotes rotate
+    const quotes = [
+      "不要害怕改變，改變是成功的第一步。",
+      "獨處讓我懂得減去他人，找到自己的生活。",
+      "每天一點心意，日子便會溫柔許多。"
+    ];
+    let qIdx = 0;
+    setInterval(()=>{
+      qIdx = (qIdx+1)%quotes.length;
+      dailyQuote.textContent = quotes[qIdx];
+    }, 8000);
+
+    // Web Speech Recognition (fallback handled)
+    let recognition = null;
+    let recognizing = false;
+    function initRecognition(){
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if(!SpeechRecognition) return null;
+      const r = new SpeechRecognition();
+      r.lang = 'zh-TW'; // 嘗試台灣中文，實務可改為閩南語support
+      r.interimResults = true;
+      r.continuous = true;
+      r.maxAlternatives = 1;
+      return r;
+    }
+
+    recognition = initRecognition();
+    if(recognition){
+      recognition.onstart = ()=> { recognizing = true; listenStatus.textContent = '收聽中...'; };
+      recognition.onend = ()=> { recognizing = false; listenStatus.textContent = '很開心和你聊天...'; };
+      recognition.onresult = (event)=>{
+        let interim = '';
+        let final = '';
+        for(let i=event.resultIndex;i<event.results.length;i++){
+          const r = event.results[i];
+          if(r.isFinal) final += r[0].transcript;
+          else interim += r[0].transcript;
+        }
+        aboveText.textContent = final || interim || '正在等待語音...';
+        // Here you would send transcript to backend -> emotion engine -> LLM
+      };
+      recognition.onerror = (e)=> {
+        console.warn('ASR error', e);
+        listenStatus.textContent = '語音辨識發生錯誤';
+      }
+    } else {
+      // Fallback notice
+      listenStatus.textContent = '瀏覽器不支援語音辨識 (Web Speech API)。';
+      btnStart.disabled = true;
+      btnStop.disabled = true;
+    }
+
+    btnStart.onclick = ()=>{
+      if(recognition && !recognizing){
+        recognition.start();
+      }
+    };
+    btnStop.onclick = ()=>{
+      if(recognition && recognizing) recognition.stop();
+    };
+
+    // Demo: Play TTS via Web SpeechSynthesis
+    document.getElementById('btnPlayTTS').onclick = ()=>{
+      const msg = new SpeechSynthesisUtterance("我聽得出來你有些疲累，想不想先休息一下，或跟我聊聊發生了什麼事？");
+      msg.lang = 'zh-TW';
+      msg.rate = 0.95; // slower
+      window.speechSynthesis.speak(msg);
+    };
+
+    /* ----------------------
+       Page3: social carousel (three sample messages)
+       ---------------------- */
+    const socialData = [
+      {
+        app:'Facebook',
+        img:'https://img.gogoshop.cloud/8e4075f5/kZphh5NrdRY.png',
+        title:'XXX 在 Facebook 有新消息',
+        body:'分享影片：家裡小聚的溫馨時刻。',
+        url:'#'
+      },
+      {
+        app:'Instagram',
+        img:'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/Instagram_logo_2016.svg/250px-Instagram_logo_2016.svg.png',
+        title:'XXX 在 Instagram 有新消息',
+        body:'出遊玩：今天去了海邊，風景很棒！',
+        url:'#'
+      },
+      {
+        app:'Threads',
+        img:'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9d/Threads_%28app%29_logo.svg/1200px-Threads_%28app%29_logo.svg.png',
+        title:'XXX 在 Threads 有新消息',
+        body:'生活對話：今天天氣真好，想一起喝茶嗎？',
+        url:'#'
+      }
+    ];
+    let sIdx = 0;
+    const socialContent = document.getElementById('socialContent');
+    const socialIcon = document.getElementById('socialIcon');
+
+    function renderSocial(i){
+      const d = socialData[i];
+      socialContent.innerHTML = `<strong>${d.title}</strong><p style="margin-top:8px;">${d.body}</p>`;
+      socialIcon.src = d.img;
+      socialIcon.alt = d.app;
+      socialIcon.onclick = ()=>{ window.open(d.url,'_blank'); }
+    }
+    document.getElementById('prevBtn').addEventListener('click', ()=>{
+      sIdx = (sIdx - 1 + socialData.length) % socialData.length;
+      renderSocial(sIdx);
+    });
+    document.getElementById('nextBtn').addEventListener('click', ()=>{
+      sIdx = (sIdx + 1) % socialData.length;
+      renderSocial(sIdx);
+    });
+    renderSocial(0);
+
+    /* ----------------------
+       Page4: simple feed
+       ---------------------- */
+    const feedList = document.getElementById('feedList');
+    const postBtn = document.getElementById('postBtn');
+    const postText = document.getElementById('postText');
+
+    // sample posts
+    const posts = [
+      {user:'阿明', time: new Date(Date.now()-1000*60*60*5), text:'剛剛吃了阿婆的手工湯圓，好吃！'},
+      {user:'社區公告', time: new Date(Date.now()-1000*60*60*24), text:'下週二社區健康檢查，上午9點開始。'},
+    ];
+    function renderFeed(){
+      feedList.innerHTML = '';
+      posts.slice().reverse().forEach(p=>{
+        const div = document.createElement('div');
+        div.className = 'post';
+        const meta = document.createElement('div');
+        meta.className = 'meta';
+        meta.textContent = p.user + ' • ' + p.time.toLocaleString();
+        const body = document.createElement('div');
+        body.textContent = p.text;
+        div.appendChild(meta);
+        div.appendChild(body);
+        feedList.appendChild(div);
+      });
+    }
+    postBtn.addEventListener('click', ()=>{
+      const text = postText.value.trim();
+      if(!text) return alert('請輸入內容');
+      posts.push({user:'使用者', time:new Date(), text});
+      postText.value = '';
+      renderFeed();
+    });
+    renderFeed();
+
+    /* ----------------------
+       Page5: health report (Chart.js + table)
+       ---------------------- */
+    const moodData = [
+      {ts:'2025-12-01',score:6,note:'天氣陰，心情稍微低落'},
+      {ts:'2025-12-02',score:7,note:'與家人視訊，心情好轉'},
+      {ts:'2025-12-03',score:5,note:'睡不好，較疲累'},
+      {ts:'2025-12-04',score:8,note:'參加社區活動，很開心'},
+      {ts:'2025-12-05',score:7,note:'日常'},
+    ];
+    // chart
+    const ctx = document.getElementById('moodChart').getContext('2d');
+    const chart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: moodData.map(d=>d.ts),
+        datasets: [{
+          label: '情緒指數 (1-10)',
+          data: moodData.map(d=>d.score),
+          fill:false,
+          tension:0.3,
+          borderWidth:3,
+          pointRadius:5,
+        }]
+      },
+      options: {
+        responsive:true,
+        scales: {
+          y: { min:0, max:10, ticks:{stepSize:1} }
+        }
+      }
+    });
+
+    // populate table
+    const tbody = document.querySelector('#reportTable tbody');
+    function renderTable(){
+      tbody.innerHTML = '';
+      moodData.slice().reverse().forEach(r=>{
+        const tr = document.createElement('tr');
+        const td1 = document.createElement('td'); td1.textContent = r.ts;
+        const td2 = document.createElement('td'); td2.textContent = r.score;
+        const td3 = document.createElement('td'); td3.textContent = r.note;
+        tr.appendChild(td1); tr.appendChild(td2); tr.appendChild(td3);
+        tbody.appendChild(tr);
+      });
+    }
+    renderTable();
+
+    /* ----------------------
+       Accessibility & keyboard shortcuts
+       ---------------------- */
+    document.addEventListener('keydown', (e)=>{
+      if(e.key === '1') showPage('home');
+      if(e.key === '2') showPage('chat');
+      if(e.key === '3') showPage('social');
+      if(e.key === '4') showPage('feed');
+      if(e.key === '5') showPage('report');
+    });
+
+    /* ----------------------
+       Notes to developer (not required for user)
+       - Replace Web Speech API parts with your 雅婷ASR/TTS endpoints.
+       - WebSocket: stream audio chunks to backend; backend returns transcripts & emotion results.
+       - For real deployment: implement auth, secure connections, consent dialogs, data retention rules.
+       ---------------------- */
+
+  </script>
+</body>
+</html>
