@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title></title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
+        }
+        h2 {
+            color: #333;
+        }
+        .input-area {
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        input[type="number"] {
+            padding: 8px;
+            margin-right: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            width: 80px;
+            /* 隱藏箭頭 (Firefox) */
+            -moz-appearance: textfield; 
+        }
+        /* 隱藏箭頭 (Chrome, Safari, Edge) */
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none; 
+            margin: 0;
+        }
+        
+        button {
+            padding: 10px 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: center;
+        }
+        th {
+            background-color: #e9ecef;
+            color: #333;
+        }
+        .average-row {
+            font-weight: bold;
+            background-color: #fff3cd;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h2>Grade Statistics</h2>
+
+    <div class="input-area">
+        <label for="mathGrade">Math</label>
+        <input type="number" id="mathGrade" min="0" max="100" value="0">
+        
+        <label for="englishGrade">English</label>
+        <input type="number" id="englishGrade" min="0" max="100" value="0">
+        
+        <button id="submitBtn">Submit</button>
+    </div>
+
+    <table id="gradeTable">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Math</th>
+                <th>English</th>
+                <th>Average</th>
+            </tr>
+        </thead>
+        <tbody id="gradeTableBody">
+        </tbody>
+        <tfoot>
+            <tr id="averageRow" class="average-row">
+                <td>Average</td>
+                <td id="avgMath">0.00</td>
+                <td id="avgEnglish">0.00</td>
+                <td id="avgOverall">0.00</td>
+            </tr>
+        </tfoot>
+    </table>
+
+    <script>
+        const mathInput = document.getElementById('mathGrade');
+        const englishInput = document.getElementById('englishGrade');
+        const submitBtn = document.getElementById('submitBtn');
+        const tableBody = document.getElementById('gradeTableBody');
+        const avgMathElement = document.getElementById('avgMath');
+        const avgEnglishElement = document.getElementById('avgEnglish');
+        const avgOverallElement = document.getElementById('avgOverall');
+        
+        /**
+         * 計算並更新所有欄位和總體平均數
+         */
+        function updateAllAverages() { 
+            const rows = tableBody.getElementsByTagName('tr');
+            let totalMath = 0;
+            let totalEnglish = 0;
+            let totalRows = rows.length;
+            let overallSum = 0;
+
+            if (totalRows === 0) {
+                avgMathElement.textContent = '0.00';
+                avgEnglishElement.textContent = '0.00';
+                avgOverallElement.textContent = '0.00';
+                return;
+            }
+
+            for (let i = 0; i < totalRows; i++) {
+                const cells = rows[i].getElementsByTagName('td');
+                
+                const mathScore = parseFloat(cells[1].textContent);
+                const englishScore = parseFloat(cells[2].textContent);
+
+                // 計算每行平均
+                const rowAverage = (mathScore + englishScore) / 2;
+                cells[3].textContent = rowAverage.toFixed(2);
+                
+                // 累積總分
+                totalMath += mathScore;
+                totalEnglish += englishScore;
+                overallSum += rowAverage;
+            }
+
+            // 計算並顯示平均
+            avgMathElement.textContent = (totalMath / totalRows).toFixed(2);
+            avgEnglishElement.textContent = (totalEnglish / totalRows).toFixed(2);
+            avgOverallElement.textContent = (overallSum / totalRows).toFixed(2);
+        }
+
+        /**
+         * 處理提交按鈕點擊事件，新增資料行
+         */
+        submitBtn.addEventListener("click", function () { 
+            const math = parseFloat(mathInput.value);
+            const english = parseFloat(englishInput.value);
+
+            if (isNaN(math) || isNaN(english) || math < 0 || english < 0 || math > 100 || english > 100) {
+                alert('請輸入有效的 0-100 分數。');
+                return;
+            }
+            
+            // 根據現有行數計算新的行編號 (從 1 開始)
+            const newRowNumber = tableBody.getElementsByTagName('tr').length + 1;
+            
+            const newRowAverage = ((math + english) / 2).toFixed(2);
+
+            const newRow = document.createElement('tr');
+            newRow.innerHTML = `
+                <td>${newRowNumber}</td>
+                <td data-subject="math">${math}</td>
+                <td data-subject="english">${english}</td>
+                <td data-subject="row-average">${newRowAverage}</td>
+            `;
+
+            tableBody.appendChild(newRow);
+
+            mathInput.value = '0'; 
+            englishInput.value = '0';
+
+            // 更新平均數
+            updateAllAverages();
+        });
+
+        // 頁面加載時，初始化平均數顯示 (應為 0.00)
+        document.addEventListener('DOMContentLoaded', updateAllAverages);
+    </script>
+</body>
+</html>
